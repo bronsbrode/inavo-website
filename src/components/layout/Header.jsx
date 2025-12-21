@@ -19,13 +19,13 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-inavo-dark/95 backdrop-blur supports-[backdrop-filter]:bg-inavo-dark/60">
       <div className="container mx-auto flex h-20 items-center justify-between px-4">
-        <Link to="/" className="flex items-center space-x-3">
+        <Link to="/" className="flex items-center space-x-0">
           <img
             src="/logo.png"
             alt="Inavo"
-            className="h-10 w-auto"
+            className="h-16 w-auto"
           />
-          <span className="text-2xl font-bold text-inavo-blue tracking-wider">INAVO</span>
+          <span className="text-4xl font-bold text-inavo-olive tracking-wider mt-1 self-end">INAVO</span>
         </Link>
 
         {/* Desktop Navigation */}
