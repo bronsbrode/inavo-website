@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Mail, Phone, MapPin, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
+import { FormField } from '@/components/FormField'
 import { validateContactForm } from '@/lib/validation'
 
 const API_URL = 'http://localhost:3001'
@@ -24,7 +25,6 @@ export function Contact() {
     setError(null)
     setFieldErrors({})
 
-    // Validate form
     const { isValid, errors } = validateContactForm(formData)
     if (!isValid) {
       setFieldErrors(errors)
@@ -56,23 +56,14 @@ export function Contact() {
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData({ ...formData, [name]: value })
-    // Clear field error when user starts typing
     if (fieldErrors[name]) {
       setFieldErrors({ ...fieldErrors, [name]: null })
     }
   }
 
-  const inputClass = (fieldName) => `
-    w-full px-4 py-2 bg-input border rounded-md
-    focus:outline-none focus:ring-2 focus:ring-inavo-blue
-    disabled:opacity-50
-    ${fieldErrors[fieldName] ? 'border-red-500' : 'border-border'}
-  `
-
   return (
     <div className="py-20">
       <div className="container mx-auto px-4">
-        {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Contact Us</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -82,7 +73,6 @@ export function Contact() {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-12 max-w-5xl mx-auto">
-          {/* Contact Form */}
           <div>
             {submitted ? (
               <Card>
@@ -101,93 +91,63 @@ export function Contact() {
                     {error}
                   </div>
                 )}
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium mb-2">
-                    Name <span className="text-red-400">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    disabled={submitting}
-                    className={inputClass('name')}
-                    placeholder="Your name"
-                  />
-                  {fieldErrors.name && (
-                    <p className="text-red-400 text-sm mt-1">{fieldErrors.name}</p>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium mb-2">
-                    Email <span className="text-red-400">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    disabled={submitting}
-                    className={inputClass('email')}
-                    placeholder="you@company.com"
-                  />
-                  {fieldErrors.email && (
-                    <p className="text-red-400 text-sm mt-1">{fieldErrors.email}</p>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="phone" className="block text-sm font-medium mb-2">
-                    Phone
-                  </label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    disabled={submitting}
-                    className={inputClass('phone')}
-                    placeholder="(123) 456-7890"
-                  />
-                  {fieldErrors.phone && (
-                    <p className="text-red-400 text-sm mt-1">{fieldErrors.phone}</p>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="company" className="block text-sm font-medium mb-2">
-                    Company
-                  </label>
-                  <input
-                    type="text"
-                    id="company"
-                    name="company"
-                    value={formData.company}
-                    onChange={handleChange}
-                    disabled={submitting}
-                    className={inputClass('company')}
-                    placeholder="Your company"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="message" className="block text-sm font-medium mb-2">
-                    Message <span className="text-red-400">*</span>
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    disabled={submitting}
-                    rows={5}
-                    className={`${inputClass('message')} resize-none`}
-                    placeholder="Tell us about your project or challenge..."
-                  />
-                  {fieldErrors.message && (
-                    <p className="text-red-400 text-sm mt-1">{fieldErrors.message}</p>
-                  )}
-                </div>
+
+                <FormField
+                  label="Name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  error={fieldErrors.name}
+                  required
+                  disabled={submitting}
+                  placeholder="Your name"
+                />
+
+                <FormField
+                  label="Email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  error={fieldErrors.email}
+                  required
+                  disabled={submitting}
+                  placeholder="you@company.com"
+                />
+
+                <FormField
+                  label="Phone"
+                  name="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  error={fieldErrors.phone}
+                  disabled={submitting}
+                  placeholder="(123) 456-7890"
+                />
+
+                <FormField
+                  label="Company"
+                  name="company"
+                  value={formData.company}
+                  onChange={handleChange}
+                  disabled={submitting}
+                  placeholder="Your company"
+                />
+
+                <FormField
+                  label="Message"
+                  name="message"
+                  type="textarea"
+                  value={formData.message}
+                  onChange={handleChange}
+                  error={fieldErrors.message}
+                  required
+                  disabled={submitting}
+                  placeholder="Tell us about your project or challenge..."
+                  rows={5}
+                />
+
                 <Button type="submit" size="lg" className="w-full" disabled={submitting}>
                   {submitting ? (
                     <>
@@ -202,7 +162,6 @@ export function Contact() {
             )}
           </div>
 
-          {/* Contact Info */}
           <div className="space-y-6">
             <Card>
               <CardHeader>
