@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Mail, Phone, MapPin, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
+import { validateContactForm } from '@/lib/validation'
 
 const API_URL = 'http://localhost:3001'
 
@@ -9,17 +10,28 @@ export function Contact() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phone: '',
     company: '',
     message: '',
   })
+  const [fieldErrors, setFieldErrors] = useState({})
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState(null)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setSubmitting(true)
     setError(null)
+    setFieldErrors({})
+
+    // Validate form
+    const { isValid, errors } = validateContactForm(formData)
+    if (!isValid) {
+      setFieldErrors(errors)
+      return
+    }
+
+    setSubmitting(true)
 
     try {
       const response = await fetch(`${API_URL}/api/contact`, {
@@ -42,8 +54,20 @@ export function Contact() {
   }
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
+    const { name, value } = e.target
+    setFormData({ ...formData, [name]: value })
+    // Clear field error when user starts typing
+    if (fieldErrors[name]) {
+      setFieldErrors({ ...fieldErrors, [name]: null })
+    }
   }
+
+  const inputClass = (fieldName) => `
+    w-full px-4 py-2 bg-input border rounded-md
+    focus:outline-none focus:ring-2 focus:ring-inavo-blue
+    disabled:opacity-50
+    ${fieldErrors[fieldName] ? 'border-red-500' : 'border-border'}
+  `
 
   return (
     <div className="py-20">
@@ -79,7 +103,7 @@ export function Contact() {
                 )}
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium mb-2">
-                    Name
+                    Name <span className="text-red-400">*</span>
                   </label>
                   <input
                     type="text"
@@ -87,15 +111,17 @@ export function Contact() {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    required
                     disabled={submitting}
-                    className="w-full px-4 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-inavo-blue disabled:opacity-50"
+                    className={inputClass('name')}
                     placeholder="Your name"
                   />
+                  {fieldErrors.name && (
+                    <p className="text-red-400 text-sm mt-1">{fieldErrors.name}</p>
+                  )}
                 </div>
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium mb-2">
-                    Email
+                    Email <span className="text-red-400">*</span>
                   </label>
                   <input
                     type="email"
@@ -103,11 +129,31 @@ export function Contact() {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    required
                     disabled={submitting}
-                    className="w-full px-4 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-inavo-blue disabled:opacity-50"
+                    className={inputClass('email')}
                     placeholder="you@company.com"
                   />
+                  {fieldErrors.email && (
+                    <p className="text-red-400 text-sm mt-1">{fieldErrors.email}</p>
+                  )}
+                </div>
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-medium mb-2">
+                    Phone
+                  </label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    disabled={submitting}
+                    className={inputClass('phone')}
+                    placeholder="(123) 456-7890"
+                  />
+                  {fieldErrors.phone && (
+                    <p className="text-red-400 text-sm mt-1">{fieldErrors.phone}</p>
+                  )}
                 </div>
                 <div>
                   <label htmlFor="company" className="block text-sm font-medium mb-2">
@@ -120,25 +166,27 @@ export function Contact() {
                     value={formData.company}
                     onChange={handleChange}
                     disabled={submitting}
-                    className="w-full px-4 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-inavo-blue disabled:opacity-50"
+                    className={inputClass('company')}
                     placeholder="Your company"
                   />
                 </div>
                 <div>
                   <label htmlFor="message" className="block text-sm font-medium mb-2">
-                    Message
+                    Message <span className="text-red-400">*</span>
                   </label>
                   <textarea
                     id="message"
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
-                    required
                     disabled={submitting}
                     rows={5}
-                    className="w-full px-4 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-inavo-blue resize-none disabled:opacity-50"
+                    className={`${inputClass('message')} resize-none`}
                     placeholder="Tell us about your project or challenge..."
                   />
+                  {fieldErrors.message && (
+                    <p className="text-red-400 text-sm mt-1">{fieldErrors.message}</p>
+                  )}
                 </div>
                 <Button type="submit" size="lg" className="w-full" disabled={submitting}>
                   {submitting ? (
