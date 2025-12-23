@@ -35,6 +35,7 @@ export function Contact() {
     try {
       await submitContactForm(formData)
       setSubmitted(true)
+      setFormData({ name: '', email: '', phone: '', company: '', message: '' })
     } catch (err) {
       setError(err.message)
     } finally {
@@ -124,18 +125,23 @@ export function Contact() {
                   placeholder="Your company"
                 />
 
-                <FormField
-                  label="Message"
-                  name="message"
-                  type="textarea"
-                  value={formData.message}
-                  onChange={handleChange}
-                  error={fieldErrors.message}
-                  required
-                  disabled={submitting}
-                  placeholder="Tell us about your project or challenge..."
-                  rows={5}
-                />
+                <div>
+                  <FormField
+                    label="Message"
+                    name="message"
+                    type="textarea"
+                    value={formData.message}
+                    onChange={handleChange}
+                    error={fieldErrors.message}
+                    required
+                    disabled={submitting}
+                    placeholder="Tell us about your project or challenge..."
+                    rows={5}
+                  />
+                  <p className="text-sm text-muted-foreground mt-1 text-right">
+                    {formData.message.length} / 1000 characters
+                  </p>
+                </div>
 
                 <Button type="submit" size="lg" className="w-full" disabled={submitting}>
                   {submitting ? (

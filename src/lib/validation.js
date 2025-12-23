@@ -94,6 +94,8 @@ export function validateContactForm(data) {
     errors.message = 'Message is required'
   } else if (!validateMinLength(data.message, 10)) {
     errors.message = 'Message must be at least 10 characters'
+  } else if (data.message.length > 1000) {
+    errors.message = 'Message must be 1000 characters or less'
   }
 
   return {
