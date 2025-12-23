@@ -71,3 +71,101 @@ export async function submitContactForm(data) {
   }
   return response.json()
 }
+
+// ============ ADMIN FUNCTIONS ============
+
+/**
+ * Get service by ID (admin)
+ */
+export async function getServiceById(id) {
+  const response = await fetch(`${API_URL}/api/services/id/${id}`)
+  if (!response.ok) throw new Error('Failed to fetch service')
+  return response.json()
+}
+
+/**
+ * Create a new service
+ */
+export async function createService(data) {
+  const response = await fetch(`${API_URL}/api/services`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error.error || 'Failed to create service')
+  }
+  return response.json()
+}
+
+/**
+ * Update a service
+ */
+export async function updateService(id, data) {
+  const response = await fetch(`${API_URL}/api/services/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error.error || 'Failed to update service')
+  }
+  return response.json()
+}
+
+/**
+ * Delete a service
+ */
+export async function deleteService(id) {
+  const response = await fetch(`${API_URL}/api/services/${id}`, {
+    method: 'DELETE',
+  })
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error.error || 'Failed to delete service')
+  }
+  return response.json()
+}
+
+// ============ CONTACT SUBMISSIONS (ADMIN) ============
+
+/**
+ * Get all contact submissions
+ */
+export async function getContactSubmissions() {
+  const response = await fetch(`${API_URL}/api/contact`)
+  if (!response.ok) throw new Error('Failed to fetch contact submissions')
+  return response.json()
+}
+
+/**
+ * Delete a contact submission
+ */
+export async function deleteContactSubmission(id) {
+  const response = await fetch(`${API_URL}/api/contact/${id}`, {
+    method: 'DELETE',
+  })
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error.error || 'Failed to delete submission')
+  }
+  return response.json()
+}
+
+/**
+ * Bulk delete contact submissions
+ */
+export async function bulkDeleteContactSubmissions(ids) {
+  const response = await fetch(`${API_URL}/api/contact`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ids }),
+  })
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error.error || 'Failed to delete submissions')
+  }
+  return response.json()
+}

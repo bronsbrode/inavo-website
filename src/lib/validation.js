@@ -69,6 +69,27 @@ export function isFutureDate(dateString) {
 }
 
 /**
+ * Checks if a value meets maximum length
+ * @param {string} value - The value to check
+ * @param {number} maxLength - Maximum allowed length
+ * @returns {boolean} - Whether the value meets maximum length
+ */
+export function validateMaxLength(value, maxLength) {
+  return !value || value.length <= maxLength
+}
+
+/**
+ * Valid contact form categories
+ */
+export const CONTACT_CATEGORIES = [
+  { value: 'general', label: 'General Inquiry' },
+  { value: 'project', label: 'Project Discussion' },
+  { value: 'partnership', label: 'Partnership' },
+  { value: 'support', label: 'Support' },
+  { value: 'other', label: 'Other' },
+]
+
+/**
  * Validates the full contact form
  * @param {object} data - Form data with name, email, message fields
  * @returns {object} - { isValid: boolean, errors: object }
@@ -76,26 +97,53 @@ export function isFutureDate(dateString) {
 export function validateContactForm(data) {
   const errors = {}
 
+  // Name: required, 2-100 characters
   if (!validateRequired(data.name)) {
     errors.name = 'Name is required'
+  } else if (!validateMinLength(data.name, 2)) {
+    errors.name = 'Name must be at least 2 characters'
+  } else if (!validateMaxLength(data.name, 100)) {
+    errors.name = 'Name must be 100 characters or less'
   }
 
+  // Email: required, valid format
   if (!validateRequired(data.email)) {
     errors.email = 'Email is required'
   } else if (!validateEmail(data.email)) {
     errors.email = 'Invalid email format'
   }
 
+  // Phone: optional, valid format if provided
   if (data.phone && !isValidPhone(data.phone)) {
     errors.phone = 'Invalid phone format'
   }
 
+  // Date: required, cannot be in the future
+  if (!validateRequired(data.date)) {
+    errors.date = 'Date is required'
+  } else if (!isNotFutureDate(data.date)) {
+    errors.date = 'Date cannot be in the future'
+  }
+
+  // Category: required, must be valid option
+  if (!validateRequired(data.category)) {
+    errors.category = 'Category is required'
+  } else if (!CONTACT_CATEGORIES.some(c => c.value === data.category)) {
+    errors.category = 'Please select a valid category'
+  }
+
+  // Message: required, 10-1000 characters
   if (!validateRequired(data.message)) {
     errors.message = 'Message is required'
   } else if (!validateMinLength(data.message, 10)) {
     errors.message = 'Message must be at least 10 characters'
   } else if (data.message.length > 1000) {
     errors.message = 'Message must be 1000 characters or less'
+  }
+
+  // Terms: required, must be checked
+  if (!data.terms) {
+    errors.terms = 'You must agree to the terms'
   }
 
   return {

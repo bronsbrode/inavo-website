@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { Mail, Phone, MapPin, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
 import { FormField } from '@/components/FormField'
-import { validateContactForm } from '@/lib/validation'
+import { Label } from '@/components/Label'
+import { validateContactForm, CONTACT_CATEGORIES } from '@/lib/validation'
 import { submitContactForm } from '@/lib/database'
 
 export function Contact() {
@@ -11,8 +13,10 @@ export function Contact() {
     name: '',
     email: '',
     phone: '',
-    company: '',
+    date: '',
+    category: '',
     message: '',
+    terms: false,
   })
   const [fieldErrors, setFieldErrors] = useState({})
   const [submitting, setSubmitting] = useState(false)
@@ -35,7 +39,15 @@ export function Contact() {
     try {
       await submitContactForm(formData)
       setSubmitted(true)
-      setFormData({ name: '', email: '', phone: '', company: '', message: '' })
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        date: '',
+        category: '',
+        message: '',
+        terms: false,
+      })
     } catch (err) {
       setError(err.message)
     } finally {
@@ -44,10 +56,20 @@ export function Contact() {
   }
 
   const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData({ ...formData, [name]: value })
+    const { name, value, type, checked } = e.target
+    setFormData({
+      ...formData,
+      [name]: type === 'checkbox' ? checked : value,
+    })
     if (fieldErrors[name]) {
       setFieldErrors({ ...fieldErrors, [name]: null })
+    }
+  }
+
+  const handleTermsChange = (checked) => {
+    setFormData({ ...formData, terms: checked })
+    if (fieldErrors.terms) {
+      setFieldErrors({ ...fieldErrors, terms: null })
     }
   }
 
@@ -117,13 +139,41 @@ export function Contact() {
                 />
 
                 <FormField
-                  label="Company"
-                  name="company"
-                  value={formData.company}
+                  label="Date"
+                  name="date"
+                  type="date"
+                  value={formData.date}
                   onChange={handleChange}
+                  error={fieldErrors.date}
+                  required
                   disabled={submitting}
-                  placeholder="Your company"
                 />
+
+                <div>
+                  <Label htmlFor="category" required>
+                    Category
+                  </Label>
+                  <select
+                    id="category"
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    disabled={submitting}
+                    className={`w-full px-4 py-2 bg-input border rounded-md focus:outline-none focus:ring-2 focus:ring-inavo-blue disabled:opacity-50 disabled:cursor-not-allowed ${
+                      fieldErrors.category ? 'border-red-500' : 'border-border'
+                    }`}
+                  >
+                    <option value="">Select a category</option>
+                    {CONTACT_CATEGORIES.map((cat) => (
+                      <option key={cat.value} value={cat.value}>
+                        {cat.label}
+                      </option>
+                    ))}
+                  </select>
+                  {fieldErrors.category && (
+                    <p className="text-red-400 text-sm mt-1">{fieldErrors.category}</p>
+                  )}
+                </div>
 
                 <div>
                   <FormField
@@ -141,6 +191,41 @@ export function Contact() {
                   <p className="text-sm text-muted-foreground mt-1 text-right">
                     {formData.message.length} / 1000 characters
                   </p>
+                </div>
+
+                <div>
+                  <div className="flex items-start gap-3">
+                    <Checkbox
+                      id="terms"
+                      checked={formData.terms}
+                      onCheckedChange={handleTermsChange}
+                      disabled={submitting}
+                      className={fieldErrors.terms ? 'border-red-500' : ''}
+                    />
+                    <div className="grid gap-1.5 leading-none">
+                      <label
+                        htmlFor="terms"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        I agree to the terms and conditions
+                        <span className="text-red-400 ml-1">*</span>
+                      </label>
+                      <p className="text-sm text-muted-foreground">
+                        By submitting this form, you agree to our{' '}
+                        <a href="/privacy" className="text-inavo-blue hover:underline">
+                          Privacy Policy
+                        </a>{' '}
+                        and{' '}
+                        <a href="/terms" className="text-inavo-blue hover:underline">
+                          Terms of Service
+                        </a>
+                        .
+                      </p>
+                    </div>
+                  </div>
+                  {fieldErrors.terms && (
+                    <p className="text-red-400 text-sm mt-1">{fieldErrors.terms}</p>
+                  )}
                 </div>
 
                 <Button type="submit" size="lg" className="w-full" disabled={submitting}>
