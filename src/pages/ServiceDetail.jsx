@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, Code, Compass, Cog, Rocket, BarChart3, Users, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-
-const API_URL = 'http://localhost:3001'
+import { getServiceBySlug } from '@/lib/database'
 
 const iconMap = {
   rocket: Rocket,
@@ -24,14 +23,7 @@ export function ServiceDetail() {
     const fetchService = async () => {
       setLoading(true)
       try {
-        const response = await fetch(`${API_URL}/api/services/${slug}`)
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error('Service not found')
-          }
-          throw new Error('Failed to fetch')
-        }
-        const data = await response.json()
+        const data = await getServiceBySlug(slug)
         setService(data)
       } catch (err) {
         setError(err.message)
@@ -74,7 +66,6 @@ export function ServiceDetail() {
     <div className="py-20">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
-          {/* Back Link */}
           <Link
             to="/services"
             className="inline-flex items-center text-muted-foreground hover:text-inavo-blue mb-8 transition-colors"
@@ -82,7 +73,6 @@ export function ServiceDetail() {
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Services
           </Link>
 
-          {/* Header */}
           <header className="mb-12">
             <div className="flex items-center gap-4 mb-6">
               <div className="p-4 bg-inavo-blue/10 rounded-xl">
@@ -97,14 +87,12 @@ export function ServiceDetail() {
             </div>
           </header>
 
-          {/* Description */}
           <section className="mb-12">
             <p className="text-xl text-foreground/90 leading-relaxed">
               {service.description}
             </p>
           </section>
 
-          {/* What We Offer */}
           <section className="mb-12 bg-inavo-dark/50 rounded-2xl p-8">
             <h2 className="text-2xl font-bold mb-6">What We Offer</h2>
             <div className="grid md:grid-cols-2 gap-4">
@@ -126,7 +114,6 @@ export function ServiceDetail() {
             </div>
           </section>
 
-          {/* CTA */}
           <div className="bg-gradient-to-r from-inavo-blue/20 to-inavo-terracotta/20 rounded-2xl p-8 md:p-12 text-center">
             <h2 className="text-2xl font-bold mb-4">Ready to Get Started?</h2>
             <p className="text-muted-foreground mb-6 max-w-lg mx-auto">

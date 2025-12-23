@@ -3,8 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, CheckCircle, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-
-const API_URL = 'http://localhost:3001'
+import { getPortfolioBySlug } from '@/lib/database'
 
 export function PortfolioDetail() {
   const { slug } = useParams()
@@ -16,14 +15,7 @@ export function PortfolioDetail() {
     const fetchItem = async () => {
       setLoading(true)
       try {
-        const response = await fetch(`${API_URL}/api/portfolio/${slug}`)
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error('Case study not found')
-          }
-          throw new Error('Failed to fetch')
-        }
-        const data = await response.json()
+        const data = await getPortfolioBySlug(slug)
         setItem(data)
       } catch (err) {
         setError(err.message)
@@ -64,7 +56,6 @@ export function PortfolioDetail() {
     <div className="py-20">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
-          {/* Back Link */}
           <Link
             to="/portfolio"
             className="inline-flex items-center text-muted-foreground hover:text-inavo-blue mb-8 transition-colors"
@@ -72,7 +63,6 @@ export function PortfolioDetail() {
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Portfolio
           </Link>
 
-          {/* Header */}
           <header className="mb-12">
             <span className="text-sm text-inavo-blue font-medium mb-4 block">
               {item.service_name || 'Case Study'}
@@ -83,14 +73,12 @@ export function PortfolioDetail() {
             </p>
           </header>
 
-          {/* Overview */}
           <section className="mb-12">
             <p className="text-lg text-foreground/90 leading-relaxed">
               {item.description}
             </p>
           </section>
 
-          {/* Challenge, Solution, Results */}
           <div className="grid md:grid-cols-1 gap-8 mb-12">
             {item.challenge && (
               <Card className="bg-inavo-dark/50">
@@ -123,7 +111,6 @@ export function PortfolioDetail() {
             )}
           </div>
 
-          {/* CTA */}
           <div className="bg-inavo-dark/50 rounded-2xl p-8 md:p-12 text-center">
             <h2 className="text-2xl font-bold mb-4">Want Similar Results?</h2>
             <p className="text-muted-foreground mb-6">

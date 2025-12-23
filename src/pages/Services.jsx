@@ -4,10 +4,8 @@ import { Code, Compass, Cog, Rocket, BarChart3, Users, Loader2, ArrowRight } fro
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { getServices } from '@/lib/database'
 
-const API_URL = 'http://localhost:3001'
-
-// Icon mapping for database icon strings
 const iconMap = {
   rocket: Rocket,
   code: Code,
@@ -80,9 +78,7 @@ export function Services() {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch(`${API_URL}/api/services`)
-      if (!response.ok) throw new Error('Failed to fetch')
-      const data = await response.json()
+      const data = await getServices()
       setServices(data)
     } catch (err) {
       setError(err.message)
@@ -101,7 +97,6 @@ export function Services() {
   return (
     <div className="py-20">
       <div className="container mx-auto px-4">
-        {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Our Services</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -111,12 +106,10 @@ export function Services() {
         </div>
 
         {loading && <LoadingState />}
-
         {error && <ErrorState error={error} onRetry={fetchServices} />}
 
         {!loading && !error && (
           <>
-            {/* Technology Services */}
             {technologyServices.length > 0 && (
               <div className="mb-16">
                 <h2 className="text-2xl font-bold mb-6 flex items-center">
@@ -131,7 +124,6 @@ export function Services() {
               </div>
             )}
 
-            {/* Business Services */}
             {businessServices.length > 0 && (
               <div className="mb-16">
                 <h2 className="text-2xl font-bold mb-6 flex items-center">
@@ -148,7 +140,6 @@ export function Services() {
           </>
         )}
 
-        {/* CTA */}
         <div className="text-center bg-inavo-dark/50 rounded-2xl p-8 md:p-12">
           <h2 className="text-2xl font-bold mb-4">Not sure which service you need?</h2>
           <p className="text-muted-foreground mb-6">

@@ -4,8 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { FormField } from '@/components/FormField'
 import { validateContactForm } from '@/lib/validation'
-
-const API_URL = 'http://localhost:3001'
+import { submitContactForm } from '@/lib/database'
 
 export function Contact() {
   const [formData, setFormData] = useState({
@@ -34,17 +33,7 @@ export function Contact() {
     setSubmitting(true)
 
     try {
-      const response = await fetch(`${API_URL}/api/contact`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'Failed to submit')
-      }
-
+      await submitContactForm(formData)
       setSubmitted(true)
     } catch (err) {
       setError(err.message)

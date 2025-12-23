@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, Calendar, Clock, User, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-
-const API_URL = 'http://localhost:3001'
+import { getBlogPostBySlug } from '@/lib/database'
 
 function formatDate(dateString) {
   if (!dateString) return ''
@@ -31,14 +30,7 @@ export function BlogPost() {
     const fetchPost = async () => {
       setLoading(true)
       try {
-        const response = await fetch(`${API_URL}/api/blog/${slug}`)
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error('Post not found')
-          }
-          throw new Error('Failed to fetch')
-        }
-        const data = await response.json()
+        const data = await getBlogPostBySlug(slug)
         setPost(data)
       } catch (err) {
         setError(err.message)
@@ -79,7 +71,6 @@ export function BlogPost() {
     <div className="py-20">
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto">
-          {/* Back Link */}
           <Link
             to="/blog"
             className="inline-flex items-center text-muted-foreground hover:text-inavo-blue mb-8 transition-colors"
@@ -87,7 +78,6 @@ export function BlogPost() {
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Blog
           </Link>
 
-          {/* Header */}
           <header className="mb-12">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">{post.title}</h1>
             <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
@@ -108,7 +98,6 @@ export function BlogPost() {
             </div>
           </header>
 
-          {/* Content */}
           <article className="prose prose-invert prose-lg max-w-none">
             {post.content?.split('\n\n').map((paragraph, index) => (
               <p key={index} className="text-foreground/90 leading-relaxed mb-6">
@@ -117,7 +106,6 @@ export function BlogPost() {
             ))}
           </article>
 
-          {/* CTA */}
           <div className="mt-16 bg-inavo-dark/50 rounded-2xl p-8 text-center">
             <h2 className="text-2xl font-bold mb-4">Need Help With Your Project?</h2>
             <p className="text-muted-foreground mb-6">
